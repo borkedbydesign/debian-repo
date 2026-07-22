@@ -1,0 +1,15 @@
+Origin: borkedbydesign
+Label: borkedbydesign APT Repository
+Codename: bookworm
+Architectures: amd64
+Components: main
+Description: Debian 12 (bookworm) packages
+SignWith: A15F7A200444244A
+
+Origin: borkedbydesign
+Label: borkedbydesign APT Repository
+Codename: trixie
+Architectures: amd64
+Components: main
+Description: Debian 13 (trixie) packages
+SignWith: A15F7A200444244A

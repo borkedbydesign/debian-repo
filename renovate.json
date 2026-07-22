@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^versions/helix\\.json$/"],
+      "matchStrings": ["\"version\":\\s*\"(?<currentValue>.*?)\""],
+      "depNameTemplate": "helix-editor/helix",
+      "packageNameTemplate": "helix-editor/helix",
+      "datasourceTemplate": "github-releases"
+    }
+  ]
+}

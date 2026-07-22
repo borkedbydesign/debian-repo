@@ -1,0 +1,188 @@
+name: Build Helix .deb (Debian 12 & 13)
+
+on:
+  push:
+    paths:
+      - 'versions/helix.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build on debian:${{ matrix.debian }}
+    runs-on: ubuntu-latest
+    container:
+      image: debian:${{ matrix.debian }}
+    strategy:
+      fail-fast: false
+      matrix:
+        debian: [bookworm, trixie]
+
+    steps:
+      - name: Bootstrap container
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            git ca-certificates curl jq build-essential pkg-config
+
+      - name: Checkout packaging repo
+        uses: actions/checkout@v4
+
+      - name: Read pinned Helix version
+        id: ver
+        run: echo "tag=$(jq -r .version versions/helix.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Clone Helix at pinned tag
+        run: |
+          git clone --branch "${{ steps.ver.outputs.tag }}" --depth 1 \
+            https://github.com/helix-editor/helix helix-src
+
+      - name: Skip broken grammars
+        working-directory: helix-src
+        run: |
+          sed -i 's/^use-grammars = .*/use-grammars = { except = ["wren", "gemini", "gotmpl"] }/' languages.toml
+          grep '^use-grammars' languages.toml
+
+      - name: Cache output
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo
+            ~/.rustup
+            helix-src/target
+          key: ${{ matrix.debian }}-rust-${{ hashFiles('helix-src/Cargo.lock') }}
+          restore-keys: |
+            ${{ matrix.debian }}-rust-
+
+      - name: Install Rust
+        run: |
+          if [ ! -d "$HOME/.rustup" ]; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+          fi
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Install cargo-deb
+        run: command -v cargo-deb >/dev/null || cargo install cargo-deb --locked
+
+      - name: Configure Debian package metadata
+        working-directory: helix-src
+        run: |
+          sed -i '/^\[package.metadata.deb\]/a section = "editors"' helix-term/Cargo.toml
+        
+      - name: Build .deb
+        working-directory: helix-src
+        env:
+          HELIX_DEFAULT_RUNTIME: /usr/lib/helix/runtime
+        run: cargo deb -- --locked
+
+      - name: Smoke test the built binary
+        working-directory: helix-src
+        run: |
+          mkdir -p /tmp/smoke
+          ./target/release/hx --version | tee /tmp/smoke/version.txt
+          ./target/release/hx --health | tee /tmp/smoke/health.txt || true
+
+      - name: Rename artifact
+        run: |
+          mkdir -p dist
+          cp helix-src/target/debian/*.deb \
+            "dist/helix_${{ steps.ver.outputs.tag }}_${{ matrix.debian }}_amd64.deb"
+
+      - name: Upload .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: helix-deb-${{ matrix.debian }}
+          path: dist/*.deb
+
+      - name: Upload smoke test output
+        uses: actions/upload-artifact@v4
+        with:
+          name: helix-smoketest-${{ matrix.debian }}
+          path: /tmp/smoke/*.txt
+
+  publish:
+    name: Publish to apt repo
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: apt-repo-publish
+      cancel-in-progress: false
+    steps:
+      - name: Checkout packaging repo
+        uses: actions/checkout@v4
+        with:
+          path: src
+
+      - name: Checkout apt repo
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: repo
+
+      - name: Download all built .debs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: helix-deb-*
+          path: incoming
+          merge-multiple: true
+
+      - name: Install reprepro + gnupg
+        run: sudo apt-get update && sudo apt-get install -y reprepro gnupg
+
+      - name: Import signing key
+        run: echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --batch --import
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+
+      - name: Sync reprepro config from packaging repo
+        run: |
+          mkdir -p repo/apt/conf
+          cp src/apt-conf/distributions repo/apt/conf/distributions
+
+      - name: Add packages to the repo
+        run: |
+          for f in incoming/*bookworm*.deb; do
+            reprepro -b repo/apt includedeb bookworm "$f"
+          done
+          for f in incoming/*trixie*.deb; do
+            reprepro -b repo/apt includedeb trixie "$f"
+          done
+
+      - name: Regenerate homepage
+        run: |
+          cd src
+          {
+            echo '<!DOCTYPE html>'
+            echo '<html lang="en">'
+            echo '<head><meta charset="utf-8"><title>Package repository</title></head>'
+            echo '<body>'
+            echo '<h1>Package repository</h1>'
+            echo '<p>Add the signing key and this repo, matching your Debian release:</p>'
+            echo '<pre>'
+            echo 'curl -fsSL https://YOUR_USER.github.io/YOUR_REPO/pubkey.gpg | sudo gpg --dearmor -o /usr/share/keyrings/yourrepo.gpg'
+            echo 'echo "deb [signed-by=/usr/share/keyrings/yourrepo.gpg] https://YOUR_USER.github.io/YOUR_REPO/apt CODENAME main" | sudo tee /etc/apt/sources.list.d/yourrepo.list'
+            echo 'sudo apt update'
+            echo '</pre>'
+            echo '<table border="1" cellpadding="6">'
+            echo '<tr><th>Package</th><th>Version</th><th>Debian 12 (bookworm)</th><th>Debian 13 (trixie)</th></tr>'
+            for f in versions/*.json; do
+              name=$(basename "$f" .json)
+              version=$(jq -r .version "$f")
+              echo "<tr><td>$name</td><td>$version</td><td>yes</td><td>yes</td></tr>"
+            done
+            echo '</table>'
+            echo '</body>'
+            echo '</html>'
+          } > ../repo/index.html
+
+      - name: Commit and push
+        run: |
+          cd repo
+          VERSION=$(jq -r .version ../src/versions/helix.json)
+          git config user.name "apt-repo-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add apt index.html
+          git commit -m "helix $VERSION" || echo "nothing new to publish"
+          git push
