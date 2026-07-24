@@ -75,7 +75,12 @@ jobs:
         working-directory: helix-src
         env:
           HELIX_DEFAULT_RUNTIME: /usr/lib/helix/runtime
-        run: cargo deb -- --locked
+        run: |
+          case "${{ matrix.debian }}" in
+            bookworm) REV="1~deb12" ;;
+            trixie)   REV="1~deb13" ;;
+          esac
+          cargo deb --deb-revision "$REV" -- --locked
 
       - name: Smoke test the built binary
         working-directory: helix-src
