@@ -1,0 +1,43 @@
+name: Release Helix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'versions/helix.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-helix.yml
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read pinned Helix version
+        id: ver
+        run: echo "tag=$(jq -r .version versions/helix.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Download built .debs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: helix-deb-*
+          path: dist
+          merge-multiple: true
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "helix-${{ steps.ver.outputs.tag }}" dist/*.deb \
+            --repo "${{ github.repository }}" \
+            --title "helix ${{ steps.ver.outputs.tag }}" \
+            --notes "Automated build for Debian 12 (bookworm) and 13 (trixie)."

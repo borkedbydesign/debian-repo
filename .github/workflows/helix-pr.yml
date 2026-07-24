@@ -1,0 +1,10 @@
+name: Test Helix (PR)
+
+on:
+  pull_request:
+    paths:
+      - 'versions/helix.json'
+
+jobs:
+  test:
+    uses: ./.github/workflows/build-helix.yml
