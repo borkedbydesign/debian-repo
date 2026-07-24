@@ -1,0 +1,19 @@
+Origin: borkedbydesign
+Label: borkedbydesign APT Repository
+Codename: trixie
+Date: Fri, 24 Jul 2026 20:35:41 UTC
+Architectures: amd64
+Components: main
+Description: Debian 13 (trixie) packages
+MD5Sum:
+ f6f580d71e6bbcf5ce043da23cbe8b4f 587 main/binary-amd64/Packages
+ ddbd2bf6d3e6b4b1674c38a816136ad3 404 main/binary-amd64/Packages.gz
+ 80b96a5da35aa9a210b629f4f692b6e3 137 main/binary-amd64/Release
+SHA1:
+ 4c765d22200f57e06f639f09377de72b4bc074ce 587 main/binary-amd64/Packages
+ d27e4392a998814ec7f724ed9105b21d07252b63 404 main/binary-amd64/Packages.gz
+ d146319dfa88b44c3ff4bec524903f282d2e7446 137 main/binary-amd64/Release
+SHA256:
+ 642af2737f571290e81fe2d5e14dba5d726b4236ec83021786d29507b82173dc 587 main/binary-amd64/Packages
+ 6f7fbd95fa25fa2c265aec7a8ac3ff60e46cd0b1cd9c10185a941012651963b7 404 main/binary-amd64/Packages.gz
+ ae189e0003e93e7f1c08b8f0b3749633f8ee7fcd0db2fe39cf6524d772d1ad9d 137 main/binary-amd64/Release

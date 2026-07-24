@@ -1,0 +1,5 @@
+Component: main
+Origin: borkedbydesign
+Label: borkedbydesign APT Repository
+Architecture: amd64
+Description: Debian 12 (bookworm) packages

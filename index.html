@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Package repository</title></head>
+<body>
+<h1>Package repository</h1>
+<p>Add the signing key and this repo, matching your Debian release:</p>
+<pre>
+curl -fsSL https://YOUR_USER.github.io/YOUR_REPO/pubkey.gpg | sudo gpg --dearmor -o /usr/share/keyrings/yourrepo.gpg
+echo "deb [signed-by=/usr/share/keyrings/yourrepo.gpg] https://YOUR_USER.github.io/YOUR_REPO/apt CODENAME main" | sudo tee /etc/apt/sources.list.d/yourrepo.list
+sudo apt update
+</pre>
+<table border="1" cellpadding="6">
+<tr><th>Package</th><th>Version</th><th>Debian 12 (bookworm)</th><th>Debian 13 (trixie)</th></tr>
+<tr><td>helix</td><td>25.07</td><td>yes</td><td>yes</td></tr>
+</table>
+</body>
+</html>

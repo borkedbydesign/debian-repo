@@ -1,0 +1,16 @@
+Package: helix
+Version: 25.7.0-1~deb12
+Architecture: amd64
+Homepage: https://helix-editor.com
+Maintainer: Blaž Hrastnik <blaz@mxxn.io>
+Installed-Size: 214722
+Depends: libc6 (>= 2.14), libc6 (>= 2.2.5), libc6 (>= 2.3), libc6 (>= 2.34), libstdc++6 (>= 5), libstdc++6 (>= 5.2)
+Priority: optional
+Section: editors
+Filename: pool/main/h/helix/helix_25.7.0-1~deb12_amd64.deb
+Size: 17418120
+SHA256: f4c8dd27024edfabe9f3c24b7100a17318f225831bf2a49453578bebc61b81c1
+SHA1: ab9d16fe79d85101fda5b42516aae40d58207a0c
+MD5sum: e563e745a84523b0dd09b3cdd956bb16
+Description: A post-modern text editor.
+

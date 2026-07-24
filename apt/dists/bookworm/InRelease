@@ -1,0 +1,29 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: borkedbydesign
+Label: borkedbydesign APT Repository
+Codename: bookworm
+Date: Fri, 24 Jul 2026 20:35:41 UTC
+Architectures: amd64
+Components: main
+Description: Debian 12 (bookworm) packages
+MD5Sum:
+ 12e3e739374ce4123e0cabff3b7ede94 587 main/binary-amd64/Packages
+ af9d52c136bdd62fd6f532628265edec 408 main/binary-amd64/Packages.gz
+ 5720317d2adde107a23578fefbe67c0e 139 main/binary-amd64/Release
+SHA1:
+ e4debb969c2a1961a8c1bec1655f378f833d86a3 587 main/binary-amd64/Packages
+ c5fef41d57bf05cf9a8082ec81eaae06fb020289 408 main/binary-amd64/Packages.gz
+ 461e793a64b6c30540da8848a690a8d036a723f6 139 main/binary-amd64/Release
+SHA256:
+ 3523dc1199380f501677eed105b5baeff950a2832e972f17272a7a9e187e7f71 587 main/binary-amd64/Packages
+ 9c39b57580c93eacd7b987565ce53e166c6c15f654dcf9ee97256e4fb77b7c1d 408 main/binary-amd64/Packages.gz
+ a4b7d3acb0f7929a91a3c297702fc528359b5182a578bf39ead2eaf02c79fdc2 139 main/binary-amd64/Release
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQS4xx9czN/lHNmSfCihX3ogBEQkSgUCamPMnQAKCRChX3ogBEQk
+SpGJAP9jWDCcygMxYNuFK468K/fFXk+UwSJvxOIR0eRr/zd+HgD/ViGUrqtViAuA
+YtnfZUYmVgBuKTnRRBMQdvTFXCw0RwU=
+=k62H
+-----END PGP SIGNATURE-----
