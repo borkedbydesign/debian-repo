@@ -21,7 +21,7 @@ jobs:
           apt-get install -y --no-install-recommends \
             git ca-certificates curl jq build-essential pkg-config
 
-      - name: Checkout packaging repo (for versions/helix.json)
+      - name: Checkout packaging repo
         uses: actions/checkout@v4
 
       - name: Read pinned Helix version
@@ -50,8 +50,7 @@ jobs:
           restore-keys: |
             ${{ matrix.debian }}-rust-
 
-      - name: Install Rust (built fresh in-container, so it links against
-          this container's glibc, not the runner's)
+      - name: Install Rust
         run: |
           if [ ! -d "$HOME/.rustup" ]; then
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
@@ -84,7 +83,7 @@ jobs:
           ./target/release/hx --version | tee /tmp/smoke/version.txt
           ./target/release/hx --health | tee /tmp/smoke/health.txt || true
 
-      - name: Rename artifact for clarity
+      - name: Rename artifact
         run: |
           mkdir -p dist
           cp helix-src/target/debian/*.deb \

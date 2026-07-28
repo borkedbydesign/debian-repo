@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "repositories": ["borkedbydesign/debian-repo"],
   "customManagers": [
     {
       "customType": "regex",
