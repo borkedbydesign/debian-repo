@@ -103,7 +103,7 @@ workflow "update_github_version" {
       "head": "helix-${steps.read_github_version_json.version}"
       "base": "main"
     })
-    url = "https://api.github.com/repos/${var.version_repo}/releases/latest"
+    url = "https://api.github.com/repos/${var.version_repo}/pulls"
     method = "POST"
     output = "response"  
   }
