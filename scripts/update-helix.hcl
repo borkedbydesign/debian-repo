@@ -5,6 +5,10 @@ workflow "update_github_version" {
     default = "helix-editor/helix"
   }
 
+  variable "repo" {
+    default = "borkedbydesign/debian-repo"
+  }
+
   variable "version_file" {
     default = "./packages/helix.json"
   }
@@ -103,7 +107,7 @@ workflow "update_github_version" {
       "head": "helix-${steps.read_github_version_json.version}"
       "base": "main"
     })
-    url = "https://api.github.com/repos/${var.version_repo}/pulls"
+    url = "https://api.github.com/repos/${var.repo}/pulls"
     method = "POST"
     output = "response"  
   }
