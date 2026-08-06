@@ -3,7 +3,7 @@ name: Test Helix (PR)
 on:
   pull_request:
     paths:
-      - 'versions/helix.json'
+      - 'packages/helix.json'
 
 jobs:
   test:
